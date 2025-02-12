@@ -1,2 +1,3 @@
-pip install pytubefix
-pip install kivy
+pytubefix
+kivy
+
