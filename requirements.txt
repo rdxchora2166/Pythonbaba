@@ -1,4 +1,6 @@
 pytubefix
+matplotlib
+numpy
 streamlit
 streamlit-modal
 streamlit-option-menu
