@@ -3,15 +3,6 @@ from pytubefix import YouTube
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Title of the app
-st.title('My Streamlit App with Pytube Integration')
-
-# Description
-st.write("This app allows you to download YouTube videos and displays a simple chart.")
-
-# Section for YouTube video downloader
-st.header('YouTube Video Downloader')
-
 # YouTube video URL input
 url = st.text_input("Enter YouTube Video URL", "")
 
@@ -20,15 +11,10 @@ if url:
         # Initialize YouTube object with the provided URL
         yt = YouTube(url)
 
-        # Display video title and description
-        st.write(f"Video Title: {yt.title}")
-        st.write(f"Description: {yt.description}")
-
-        # Display thumbnail
-        st.image(yt.thumbnail_url, caption="Video Thumbnail")
+        
 
         # Select stream to download
-        stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
+        stream = yt.streams.filter(only_audio=True, file_extension='mp4').first()
 
         # Button to download video
         if st.button('Download Video'):
