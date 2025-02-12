@@ -2,5 +2,5 @@ pytubefix
 streamlit--1.25.0
 streamlit-modal==0.1.0 
 streamlit-option-menu--0.3.6
-streamlit-server-state= 0.16.0
+streamlit-server-state==0.16.0
 
