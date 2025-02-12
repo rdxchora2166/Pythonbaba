@@ -1,50 +1,58 @@
-from kivy.app import App
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.boxlayout import BoxLayout
-from pytubefix import YouTube
+import streamlit as st
+from pytube import YouTube
+import numpy as np
+import matplotlib.pyplot as plt
 
-class MyApp(App):
-    def build(self):
-        # Create a BoxLayout to hold the widgets
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+# Title of the app
+st.title('My Streamlit App with Pytube Integration')
 
-        # Create a label
-        self.label = Label(text="Enter YouTube URL:")
+# Description
+st.write("This app allows you to download YouTube videos and displays a simple chart.")
 
-        # Create a text input for the YouTube URL
-        self.url_input = TextInput(hint_text="Paste YouTube URL here", multiline=False)
+# Section for YouTube video downloader
+st.header('YouTube Video Downloader')
 
-        # Create a button to start the download
-        download_button = Button(text="Download Video")
-        download_button.bind(on_press=self.download_video)
+# YouTube video URL input
+url = st.text_input("Enter YouTube Video URL", "")
 
-        # Add widgets to the layout
-        layout.add_widget(self.label)
-        layout.add_widget(self.url_input)
-        layout.add_widget(download_button)
+if url:
+    try:
+        # Initialize YouTube object with the provided URL
+        yt = YouTube(url)
 
-        return layout
+        # Display video title and description
+        st.write(f"Video Title: {yt.title}")
+        st.write(f"Description: {yt.description}")
 
-    def download_video(self, instance):
-        # Get the URL from the text input
-        url = self.url_input.text.strip()
+        # Display thumbnail
+        st.image(yt.thumbnail_url, caption="Video Thumbnail")
 
-        if not url:
-            self.label.text = "Please enter a valid YouTube URL."
-            return
+        # Select stream to download
+        stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
 
-        try:
-            # Initialize YouTube object
-            yt = YouTube(url)
-            # Get the highest resolution stream
-            ys = yt.streams.get_highest_resolution()
+        # Button to download video
+        if st.button('Download Video'):
             # Download the video
-            ys.download()
-            self.label.text = f"Downloaded: {yt.title}"
-        except Exception as e:
-            self.label.text = f"Error: {str(e)}"
+            stream.download()
+            st.success('Video downloaded successfully!')
 
-if __name__ == "__main__":
-    MyApp().run()
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+# Add a slider to the app for plotting purposes
+slider_value = st.slider('Select a value', 0, 100, 50)
+
+# Display the selected value
+st.write(f"You selected: {slider_value}")
+
+# Generate data based on the slider value
+x = np.linspace(0, 10, 100)
+y = np.sin(x) * slider_value / 50
+
+# Create a plot
+fig, ax = plt.subplots()
+ax.plot(x, y, label=f'Sine wave scaled by {slider_value}')
+ax.legend()
+
+# Display the plot in Streamlit
+st.pyplot(fig)
