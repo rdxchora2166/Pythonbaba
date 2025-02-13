@@ -1,5 +1,4 @@
 pytubefix
-pytube
 kivy
 numpy 
 matplotlib
