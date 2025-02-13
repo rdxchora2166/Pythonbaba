@@ -1,4 +1,5 @@
 pytubefix
+streamlit 
 streamlit--1.25.0
 streamlit-modal==0.1.0 
 streamlit-option-menu--0.3.6
