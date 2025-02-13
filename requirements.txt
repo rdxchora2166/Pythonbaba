@@ -1,5 +1,4 @@
 pytubefix
-kivy
 numpy 
 matplotlib
 streamlit--1.25.0
