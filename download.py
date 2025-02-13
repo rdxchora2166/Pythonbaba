@@ -1,47 +1,59 @@
-import kivy
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-import pytubefix as pytube
+import streamlit as st
+from pytube import YouTube
+from pytubefix import YouTube
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Title of the app
+st.title('My Streamlit App with Pytube Integration')
 
-class YouTubeDownloader(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(orientation='vertical', padding=20, spacing=10, **kwargs)
+# Description
+st.write("This app allows you to download YouTube videos and displays a simple chart.")
 
-        self.label = Label(text="Enter YouTube URL:")
-        self.add_widget(self.label)
+# Section for YouTube video downloader
+st.header('YouTube Video Downloader')
 
-        self.url_input = TextInput(hint_text="Paste video URL here", multiline=False)
-        self.add_widget(self.url_input)
+# YouTube video URL input
+url = st.text_input("Enter YouTube Video URL", "")
 
-        self.download_button = Button(text="Download Video", on_press=self.download_video)
-        self.add_widget(self.download_button)
+if url:
+    try:
+        # Initialize YouTube object with the provided URL
+        yt = YouTube(url)
 
-        self.status_label = Label(text="")
-        self.add_widget(self.status_label)
+        # Display video title and description
+        st.write(f"Video Title: {yt.title}")
+        st.write(f"Description: {yt.description}")
 
-    def download_video(self, instance):
-        url = self.url_input.text
-        if not url:
-            self.status_label.text = "Please enter a valid URL"
-            return
+        # Display thumbnail
+        
 
-        try:
-            yt = pytube.YouTube(url)
-            stream = yt.streams.get_highest_resolution()
+        # Select stream to download
+        stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+
+        # Button to download video
+        if st.button('Download Video'):
+            # Download the video
             stream.download()
-            self.status_label.text = f"Downloaded: {yt.title}"
-        except Exception as e:
-            self.status_label.text = f"Error: {str(e)}"
+            st.success('Video downloaded successfully!')
 
+    except Exception as e:
+        st.error(f"Error: {e}")
 
-class YouTubeDownloaderApp(App):
-    def build(self):
-        return YouTubeDownloader()
+# Add a slider to the app for plotting purposes
+slider_value = st.slider('Select a value', 0, 100, 50)
 
+# Display the selected value
+st.write(f"You selected: {slider_value}")
 
-if __name__ == "__main__":
-    YouTubeDownloaderApp().run()
+# Generate data based on the slider value
+x = np.linspace(0, 10, 100)
+y = np.sin(x) * slider_value / 50
+
+# Create a plot
+fig, ax = plt.subplots()
+ax.plot(x, y, label=f'Sine wave scaled by {slider_value}')
+ax.legend()
+
+# Display the plot in Streamlit
+st.pyplot(fig)
