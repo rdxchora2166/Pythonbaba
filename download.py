@@ -1,24 +1,47 @@
-import streamlit as st
+import kivy
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.label import Label
 import pytubefix as pytube
 
-# Streamlit App Title
-st.title("🎥 YouTube Video Downloader")
 
-# Input for YouTube URL
-video_url = st.text_input("Enter YouTube Video URL:", "")
+class YouTubeDownloader(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(orientation='vertical', padding=20, spacing=10, **kwargs)
 
-if st.button("Download Video"):
-    if video_url:
+        self.label = Label(text="Enter YouTube URL:")
+        self.add_widget(self.label)
+
+        self.url_input = TextInput(hint_text="Paste video URL here", multiline=False)
+        self.add_widget(self.url_input)
+
+        self.download_button = Button(text="Download Video", on_press=self.download_video)
+        self.add_widget(self.download_button)
+
+        self.status_label = Label(text="")
+        self.add_widget(self.status_label)
+
+    def download_video(self, instance):
+        url = self.url_input.text
+        if not url:
+            self.status_label.text = "Please enter a valid URL"
+            return
+
         try:
-            # Get YouTube video
-            yt = pytube.YouTube(video_url)
+            yt = pytube.YouTube(url)
             stream = yt.streams.get_highest_resolution()
-            
-            # Download video
             stream.download()
-            st.success(f"✅ Download Completed: {yt.title}")
-        
+            self.status_label.text = f"Downloaded: {yt.title}"
         except Exception as e:
-            st.error(f"❌ Error: {e}")
-    else:
-        st.warning("⚠️ Please enter a valid YouTube URL")
+            self.status_label.text = f"Error: {str(e)}"
+
+
+class YouTubeDownloaderApp(App):
+    def build(self):
+        return YouTubeDownloader()
+
+
+if __name__ == "__main__":
+    YouTubeDownloaderApp().run()
